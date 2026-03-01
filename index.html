@@ -3556,16 +3556,19 @@ window.addEventListener('DOMContentLoaded', function () {
         btn.textContent = '⏳ Đang vào...'; btn.disabled = true;
         try {
             const sb = getSB();
-            // Kiểm tra phòng có tồn tại không
-            const { data: existing } = await sb.from('room_members')
-                .select('*').eq('room_code', code);
-            if (!existing || existing.length === 0) {
+            // Kiểm tra phòng có tồn tại không — dùng room_messages để tránh lỗi khi phòng tạm thời trống
+            const { data: roomCheck } = await sb.from('room_messages')
+                .select('id').eq('room_code', code).limit(1);
+            if (!roomCheck || roomCheck.length === 0) {
                 btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
                 showRoomError('Không tìm thấy phòng "' + code + '"! Kiểm tra lại mã nhé.');
                 return;
             }
-            // Kiểm tra giới hạn 5 người
-            const activeMembers = existing.filter(m => {
+            // Lấy danh sách thành viên hiện tại
+            const { data: existing } = await sb.from('room_members')
+                .select('*').eq('room_code', code);
+            // Kiểm tra giới hạn 5 người (chỉ đếm active members)
+            const activeMembers = (existing || []).filter(m => {
                 const lastSeen = new Date(m.last_seen).getTime();
                 return Date.now() - lastSeen < 30000;
             });
@@ -3635,9 +3638,12 @@ window.addEventListener('DOMContentLoaded', function () {
         const memberList = document.getElementById('room-members-list');
         memberList.innerHTML = '';
         let count = 0;
+        const now = Date.now();
         const statusEmoji = { studying: '📖 Đang học', break: '☕ Đang nghỉ', done: '✅ Xong rồi' };
         const statusClass = { studying: 'studying', break: 'break', done: 'done' };
-        (members || []).forEach(m => {
+        // Chỉ hiển thị thành viên còn active (last_seen trong vòng 30 giây)
+        const activeDisplayMembers = (members || []).filter(m => (now - new Date(m.last_seen).getTime()) < 30000);
+        activeDisplayMembers.forEach(m => {
             count++;
             const st = m.status || 'studying';
             const stLabel = statusEmoji[st] || '📖 Đang học';
