@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co;">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * https://generativelanguage.googleapis.com https://firebaseio.com wss://*.firebaseio.com;">
     <title>Trạm Tự Học Focus</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
@@ -160,18 +159,120 @@ button { font-family:'Nunito',sans-serif; }
 #card-index { font-weight:800; font-size:1rem; color:#888; min-width:60px; text-align:center; }
 
 /* ============================
-   CHATBOT
+   AI CHATBOT - FULL VERSION
    ============================ */
-.chatbot-container { background:#1e1e1e; padding:20px; border-radius:20px; width:350px; margin:0 auto; display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(0,0,0,.5); height:500px; }
-.chatbot-container h2 { font-size:1.5rem; margin-bottom:10px; color:#a855f7; text-align:center; }
-.coming-soon-banner { background:linear-gradient(135deg,#f97316,#ec4899); color:white; text-align:center; padding:8px; border-radius:8px; font-weight:700; font-size:.85rem; margin-bottom:12px; }
-.chat-window { flex-grow:1; background:#121212; border-radius:10px; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; border:1px solid #333; }
-.message { padding:10px 15px; border-radius:15px; max-width:85%; font-size:.95rem; line-height:1.4; word-wrap:break-word; }
-.message.bot { background:#334155; color:white; align-self:flex-start; }
-.message.user { background:#a855f7; color:white; align-self:flex-end; }
-.chat-input-area { display:flex; gap:10px; }
-#chat-input { flex-grow:1; padding:10px; border-radius:8px; border:none; background:#2a2a2a; color:white; outline:none; font-size:1rem; }
-#send-btn { background:#a855f7; padding:10px 15px; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+.ai-wrapper {
+    max-width: 780px; margin: 0 auto;
+    background: #1a1a2e; border-radius: 24px;
+    overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    display: flex; flex-direction: column; height: 78vh; min-height: 500px;
+}
+.ai-header {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    padding: 18px 24px; display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+}
+.ai-header-icon { font-size: 2rem; }
+.ai-header-info h2 { color: white; font-size: 1.25rem; font-weight: 800; margin: 0; }
+.ai-header-info p  { color: rgba(255,255,255,.75); font-size: .8rem; margin: 2px 0 0; }
+.ai-status { width: 10px; height: 10px; background: #4ade80; border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80; margin-left: auto; animation: pulse-green 2s infinite; }
+@keyframes pulse-green { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.ai-tabs {
+    display: flex; gap: 0; background: #111827; flex-shrink: 0;
+    border-bottom: 2px solid #2d2d44; overflow-x: auto;
+}
+.ai-tab {
+    padding: 10px 16px; background: transparent; border: none;
+    color: #888; font-size: .82rem; font-weight: 700; cursor: pointer;
+    font-family: 'Nunito', sans-serif; transition: .2s; white-space: nowrap;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+}
+.ai-tab:hover { color: #a855f7; }
+.ai-tab.active { color: #a855f7; border-bottom-color: #a855f7; background: #1a1a2e; }
+
+.ai-chat-window {
+    flex: 1; overflow-y: auto; padding: 20px; display: flex;
+    flex-direction: column; gap: 14px; background: #111827;
+}
+.ai-chat-window::-webkit-scrollbar { width: 5px; }
+.ai-chat-window::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+
+.ai-msg { display: flex; gap: 10px; animation: slideUp .3s ease; }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.ai-msg.user { flex-direction: row-reverse; }
+.ai-msg-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.ai-msg.bot .ai-msg-avatar { background: linear-gradient(135deg,#7c3aed,#a855f7); }
+.ai-msg.user .ai-msg-avatar { background: linear-gradient(135deg,#1d4ed8,#3b82f6); }
+.ai-msg-bubble {
+    max-width: 72%; padding: 12px 16px; border-radius: 18px;
+    font-size: .9rem; line-height: 1.6; word-break: break-word;
+}
+.ai-msg.bot .ai-msg-bubble {
+    background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 4px;
+}
+.ai-msg.user .ai-msg-bubble {
+    background: linear-gradient(135deg,#7c3aed,#a855f7); color: white;
+    border-bottom-right-radius: 4px;
+}
+.ai-msg-bubble pre { white-space: pre-wrap; font-family: 'Courier New', monospace;
+    background: #0f172a; padding: 10px; border-radius: 8px; font-size: .82rem;
+    margin: 8px 0 0; overflow-x: auto; }
+.ai-typing { display: flex; gap: 5px; align-items: center; padding: 14px 16px; }
+.ai-typing span {
+    width: 8px; height: 8px; background: #a855f7; border-radius: 50%;
+    animation: bounce-dot .8s infinite;
+}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce-dot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+
+.ai-input-area {
+    padding: 16px 20px; background: #1a1a2e;
+    border-top: 1px solid #2d2d44; display: flex; gap: 10px;
+    align-items: flex-end; flex-shrink: 0;
+}
+#ai-chat-input {
+    flex: 1; padding: 12px 16px; background: #111827;
+    border: 2px solid #374151; border-radius: 14px;
+    color: white; font-size: .95rem; font-family: 'Nunito', sans-serif;
+    outline: none; resize: none; min-height: 44px; max-height: 120px;
+    overflow-y: auto; transition: border-color .2s;
+}
+#ai-chat-input:focus { border-color: #7c3aed; }
+#ai-chat-input::placeholder { color: #4b5563; }
+#ai-send-btn {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg,#7c3aed,#a855f7);
+    border: none; color: white; font-size: 1.1rem; cursor: pointer;
+    transition: .2s; display: flex; align-items: center; justify-content: center;
+}
+#ai-send-btn:hover { transform: scale(1.07); box-shadow: 0 4px 16px rgba(168,85,247,.5); }
+#ai-send-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.ai-clear-btn {
+    background: transparent; border: 1px solid #374151; color: #888;
+    border-radius: 10px; padding: 6px 12px; font-size: .78rem;
+    cursor: pointer; font-family: 'Nunito', sans-serif; transition: .2s;
+}
+.ai-clear-btn:hover { border-color: #7c3aed; color: #a855f7; }
+.ai-footer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px 12px; flex-shrink: 0;
+}
+.ai-footer-row small { color: #4b5563; font-size: .72rem; }
+
+/* Legacy (unused but keep for compat) */
+.chatbot-container { display:none; }
+.coming-soon-banner { display:none; }
+.chat-window { display:none; }
+.message { display:none; }
+.chat-input-area { display:none; }
+#chat-input { display:none; }
+#send-btn { display:none; }
 
 /* ============================
    TIMER POPUP - FIXED TOÀN CỤC
@@ -977,155 +1078,9 @@ body { transition: background .5s; }
 .bmi-bar-bg { height:14px; border-radius:7px; background:linear-gradient(90deg,#3b82f6,#4ade80,#facc15,#f97316,#ef4444); position:relative; overflow:visible; margin-bottom:8px; }
 .bmi-bar-needle { position:absolute; top:-6px; width:4px; height:26px; background:white; border-radius:2px; transform:translateX(-50%); transition:left .5s; box-shadow:0 0 8px rgba(255,255,255,.6); }
 .bmi-cats { display:flex; justify-content:space-between; font-size:.65rem; color:#888; }
-
-/* ============================
-   LOGIN OVERLAY
-   ============================ */
-#login-overlay {
-    display:none; position:fixed; inset:0; z-index:9999;
-    background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-    justify-content:center; align-items:center;
-}
-#login-overlay.show { display:flex; }
-.login-box {
-    background:rgba(255,255,255,.08); backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,.15); border-radius:28px;
-    padding:48px 40px; width:100%; max-width:420px; text-align:center;
-    box-shadow:0 30px 80px rgba(0,0,0,.5); animation:fadeInUp .5s ease;
-}
-.login-logo { font-size:3.5rem; margin-bottom:12px; }
-.login-box h2 { font-family:'Pacifico',cursive; font-size:1.8rem; color:#fde047; margin-bottom:6px; }
-.login-box > p { color:rgba(255,255,255,.6); font-size:.95rem; margin-bottom:24px; }
-.login-mode-tabs { display:flex; gap:8px; margin-bottom:20px; }
-.login-tab {
-    flex:1; padding:10px; background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.15); border-radius:10px;
-    color:rgba(255,255,255,.5); font-weight:700; font-family:'Nunito',sans-serif;
-    cursor:pointer; transition:.2s; font-size:.9rem;
-}
-.login-tab.active { background:rgba(168,85,247,.3); border-color:#a855f7; color:white; }
-.login-input {
-    width:100%; padding:14px 18px; background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.2); border-radius:14px; color:white;
-    font-size:1rem; font-family:'Nunito',sans-serif; margin-bottom:12px; outline:none;
-    transition:border-color .2s; box-sizing:border-box;
-}
-.login-input:focus { border-color:#a855f7; }
-.login-input::placeholder { color:rgba(255,255,255,.35); }
-.btn-login-main {
-    width:100%; padding:15px;
-    background:linear-gradient(135deg,#a855f7,#ec4899);
-    border:none; border-radius:14px; color:white;
-    font-size:1.05rem; font-weight:800; font-family:'Nunito',sans-serif;
-    cursor:pointer; transition:.3s; margin-bottom:12px;
-}
-.btn-login-main:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(168,85,247,.4); }
-.btn-google {
-    width:100%; padding:13px; background:rgba(255,255,255,.1);
-    border:1px solid rgba(255,255,255,.25); border-radius:14px; color:white;
-    font-size:.95rem; font-weight:700; font-family:'Nunito',sans-serif;
-    cursor:pointer; transition:.3s; margin-bottom:18px;
-}
-.btn-google:hover { background:rgba(255,255,255,.18); transform:translateY(-2px); }
-.login-err { color:#f87171; font-size:.88rem; margin-bottom:10px; min-height:20px; }
-.login-toggle-txt { color:rgba(255,255,255,.5); font-size:.88rem; }
-.login-toggle-txt span { color:#a855f7; cursor:pointer; font-weight:700; }
-
-/* User badge */
-#user-badge {
-    display:none; position:fixed; top:12px; right:15px; z-index:600;
-    align-items:center; gap:8px; background:rgba(0,0,0,.4);
-    backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.2);
-    border-radius:30px; padding:7px 16px 7px 10px; cursor:pointer; transition:.3s;
-}
-#user-badge.show { display:flex; }
-#user-badge:hover { background:rgba(255,255,255,.15); }
-#badge-ava { font-size:1.3rem; }
-#badge-nm { color:white; font-weight:700; font-size:.88rem; }
-#badge-xp { color:#fde047; font-size:.78rem; font-weight:700; }
-
-#user-menu {
-    display:none; position:fixed; top:58px; right:15px; z-index:601;
-    background:#1e1e2e; border:1px solid rgba(255,255,255,.15);
-    border-radius:16px; padding:8px; min-width:180px;
-    box-shadow:0 10px 40px rgba(0,0,0,.5);
-}
-#user-menu.show { display:block; }
-.umenu-item {
-    padding:10px 14px; border-radius:10px; color:rgba(255,255,255,.8);
-    font-size:.9rem; font-weight:600; cursor:pointer; transition:background .2s;
-}
-.umenu-item:hover { background:rgba(255,255,255,.08); }
-.umenu-item.red { color:#f87171; }
-
-/* Leaderboard */
-.lb-wrap { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
-.lb-row {
-    display:flex; align-items:center; gap:12px;
-    background:rgba(255,255,255,.05); border-radius:14px;
-    padding:12px 16px; border:1px solid rgba(255,255,255,.08);
-}
-.lb-row.lb-me { border-color:#a855f7; background:rgba(168,85,247,.1); }
-.lb-rank { font-size:1.3rem; width:30px; text-align:center; font-weight:800; }
-.lb-ava { font-size:1.5rem; }
-.lb-info { flex:1; }
-.lb-name { font-weight:700; color:white; font-size:.92rem; }
-.lb-xp-txt { color:#fde047; font-size:.8rem; font-weight:600; }
-
-
-.ai-mode-btn {
-    padding:6px 14px; border-radius:20px; border:1px solid rgba(168,85,247,.4);
-    background:rgba(168,85,247,.1); color:rgba(255,255,255,.7);
-    font-size:.8rem; font-weight:700; font-family:'Nunito',sans-serif;
-    cursor:pointer; transition:.2s;
-}
-.ai-mode-btn:hover { background:rgba(168,85,247,.3); color:white; }
-.ai-mode-btn.active { background:rgba(168,85,247,.5); border-color:#a855f7; color:white; }
-.message.thinking { opacity:.6; font-style:italic; }
-.message.thinking::after { content:''; animation:dots 1.2s infinite; }
-@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
-
 </style>
 </head>
 <body>
-
-    <!-- LOGIN OVERLAY -->
-    <div id="login-overlay" class="show">
-      <div class="login-box">
-        <div class="login-logo">📚</div>
-        <h2>Trạm Học Tập</h2>
-        <p>Đăng nhập để lưu tiến trình &amp; học cùng bạn bè</p>
-        <div class="login-mode-tabs">
-          <button class="login-tab active" id="tab-login" onclick="switchTab('login')">Đăng nhập</button>
-          <button class="login-tab" id="tab-register" onclick="switchTab('register')">Đăng ký</button>
-        </div>
-        <div class="login-err" id="login-err"></div>
-        <div id="name-wrap" style="display:none">
-          <input class="login-input" id="inp-name" type="text" placeholder="Tên hiển thị của bạn" maxlength="20">
-        </div>
-        <input class="login-input" id="inp-email" type="email" placeholder="Email">
-        <input class="login-input" id="inp-pw" type="password" placeholder="Mật khẩu">
-        <button class="btn-login-main" id="auth-btn" onclick="doEmailAuth()">Đăng nhập</button>
-        
-        <div class="login-toggle-txt" id="toggle-txt">
-          Chưa có tài khoản? <span onclick="switchTab('register')">Đăng ký ngay</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- USER BADGE -->
-    <div id="user-badge" onclick="toggleMenu()">
-      <span id="badge-ava">🧑‍🎓</span>
-      <div>
-        <div id="badge-nm">Học sinh</div>
-        <div id="badge-xp">⭐ 0 XP</div>
-      </div>
-    </div>
-    <div id="user-menu">
-      <div class="umenu-item" onclick="openLeaderboard()">🏆 Bảng xếp hạng</div>
-      <div class="umenu-item red" onclick="doLogout()">🚪 Đăng xuất</div>
-    </div>
-
 
     <!-- ====== CHÀO MỪNG ====== -->
     <div id="welcome-screen">
@@ -1439,7 +1394,7 @@ body { transition: background .5s; }
                     </div>
                     <div class="room-firebase-note">
                         <span>⚡</span>
-                        <span>Phòng học dùng <b>Supabase Realtime</b> — tối đa <b>5 người/phòng</b>, cần đăng nhập tài khoản trước!</span>
+                        <span>Dùng <b>Firebase Realtime Database</b> — cần bật Rules: <b>read/write = true</b> trong Firebase Console để hoạt động thật!</span>
                     </div>
                 </div>
 
@@ -1495,22 +1450,40 @@ body { transition: background .5s; }
         </div>
 
         <div id="section-chatbot" class="section">
-            <div style="width:100%;max-width:720px;margin:0 auto;display:flex;flex-direction:column;height:620px;background:#1e1e1e;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.5);">
-                <h2 style="color:#a855f7;text-align:center;margin-bottom:12px;font-size:1.4rem;">🤖 Trợ Lý AI Focus</h2>
-                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-                    <button class="ai-mode-btn active" onclick="setAIMode(this,'general')">💬 Chung</button>
-                    <button class="ai-mode-btn" onclick="setAIMode(this,'math')">🔢 Toán</button>
-                    <button class="ai-mode-btn" onclick="setAIMode(this,'lit')">📚 Văn</button>
-                    <button class="ai-mode-btn" onclick="setAIMode(this,'eng')">🌍 Anh</button>
-                    <button class="ai-mode-btn" onclick="setAIMode(this,'sci')">🔬 Khoa học</button>
-                    <button class="ai-mode-btn" onclick="setAIMode(this,'hist')">🏛️ Lịch sử</button>
+            <div class="ai-wrapper">
+                <!-- Header -->
+                <div class="ai-header">
+                    <div class="ai-header-icon">🤖</div>
+                    <div class="ai-header-info">
+                        <h2>Trợ Lý AI Focus</h2>
+                        <p>Powered by Gemini — Hỏi bất cứ điều gì về học tập!</p>
+                    </div>
+                    <div class="ai-status" title="Đang hoạt động"></div>
                 </div>
-                <div id="chat-window" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#151515;border-radius:14px;">
-                    <div class="message bot">Chào bạn! 👋 Mình là trợ lý AI học tập powered by Gemini. Hỏi mình bất cứ điều gì — Toán, Văn, Anh, Khoa học, Lịch sử... mình đều giúp được! 😊</div>
+
+                <!-- Tabs môn học -->
+                <div class="ai-tabs">
+                    <button class="ai-tab active" data-subject="chung">💬 Chung</button>
+                    <button class="ai-tab" data-subject="toan">🔢 Toán</button>
+                    <button class="ai-tab" data-subject="van">📚 Văn</button>
+                    <button class="ai-tab" data-subject="anh">🌍 Anh</button>
+                    <button class="ai-tab" data-subject="khoa">🔬 Khoa học</button>
+                    <button class="ai-tab" data-subject="su">🏛️ Lịch sử</button>
                 </div>
-                <div style="display:flex;gap:8px;margin-top:12px;">
-                    <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn..." style="flex:1;padding:12px 16px;border-radius:12px;border:1px solid rgba(168,85,247,.4);background:#2a2a2a;color:white;font-size:1rem;font-family:'Nunito',sans-serif;outline:none;">
-                    <button id="send-btn" onclick="sendAIChat()" style="padding:12px 20px;background:linear-gradient(135deg,#a855f7,#ec4899);border:none;border-radius:12px;color:white;font-weight:800;font-size:1rem;cursor:pointer;font-family:'Nunito',sans-serif;">Gửi ➤</button>
+
+                <!-- Cửa sổ chat -->
+                <div class="ai-chat-window" id="ai-chat-window"></div>
+
+                <!-- Footer nhỏ -->
+                <div class="ai-footer-row">
+                    <small id="ai-subject-label">Đang hỏi: Chung</small>
+                    <button class="ai-clear-btn" id="ai-clear-btn">🗑️ Xoá chat</button>
+                </div>
+
+                <!-- Ô nhập -->
+                <div class="ai-input-area">
+                    <textarea id="ai-chat-input" placeholder="Nhập câu hỏi của bạn..." rows="1"></textarea>
+                    <button id="ai-send-btn" title="Gửi">➤</button>
                 </div>
             </div>
         </div>
@@ -1766,8 +1739,8 @@ window.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btn-periodic').addEventListener('click', () => showSection('periodic'));
     document.getElementById('btn-quiz').addEventListener('click', () => { showSection('quiz'); initQuizSetup(); });
     document.getElementById('btn-studyroom').addEventListener('click', () => showSection('studyroom'));
-    document.getElementById('btn-chatbot').addEventListener('click', () => showSection('chatbot'));
     document.getElementById('btn-converter').addEventListener('click', () => { showSection('converter'); initConverter(); });
+    document.getElementById('btn-chatbot').addEventListener('click', () => showSection('chatbot'));
 
     // Nút "📍 Pomodoro" trên popup → chuyển về pomodoro
     popupGotoBtn.addEventListener('click', () => showSection('pomodoro'));
@@ -2331,8 +2304,6 @@ window.addEventListener('DOMContentLoaded', function () {
                     forest.push(selectedTree.emoji);
                     saveToLocal();
                     renderForest();
-                    // Thưởng EXP khi hoàn thành 25 phút
-                    if (window._awardEXP) window._awardEXP(10, 'Hoàn thành 25 phút học 🌳');
 
                     const remainingStudy = pomoCycleTotal - pomoCycleElapsed;
 
@@ -3423,11 +3394,12 @@ window.addEventListener('DOMContentLoaded', function () {
     document.getElementById('quiz-back-btn').addEventListener('click', () => initQuizSetup());
 
     // ====================================================
-    // 🤝 PHÒNG HỌC CHUNG (Supabase Realtime)
+    // 🤝 PHÒNG HỌC CHUNG (Firebase Realtime Database)
     // ====================================================
-    const MAX_ROOM_MEMBERS = 5;
+    const FIREBASE_URL = 'https://tramhoctap-default-rtdb.firebaseio.com';
     let roomCode = null, myUserId = null, myAvatar = '🐼', myName = '';
-    let roomChannel = null, roomPollInterval = null;
+    let roomRef = null, heartbeatInterval = null, roomPollInterval = null;
+    let firebaseOK = true; // tracks if firebase is accessible
 
     let selectedAvatar = '🐼';
     document.querySelectorAll('.av-opt').forEach(opt => {
@@ -3449,18 +3421,54 @@ window.addEventListener('DOMContentLoaded', function () {
             note.innerHTML = `<span>⚠️</span><span style="color:#f87171">${msg}</span>`;
         }
     }
-    function showRoomInfo(msg) {
-        const note = document.querySelector('.room-firebase-note');
-        if (note) {
-            note.style.borderColor = '#3b82f6';
-            note.style.background = '#1a2040';
-            note.innerHTML = `<span>ℹ️</span><span style="color:#60a5fa">${msg}</span>`;
+
+    async function firebaseSet(path, data) {
+        try {
+            const r = await fetch(`${FIREBASE_URL}/${path}.json`, {
+                method: 'PUT', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            firebaseOK = true;
+        } catch(e) { firebaseOK = false; console.warn('Firebase SET error:', e); }
+    }
+    async function firebasePatch(path, data) {
+        try {
+            const r = await fetch(`${FIREBASE_URL}/${path}.json`, {
+                method: 'PATCH', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+        } catch(e) { console.warn('Firebase PATCH error:', e); }
+    }
+    async function firebaseGet(path) {
+        try {
+            const r = await fetch(`${FIREBASE_URL}/${path}.json`);
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const data = await r.json();
+            firebaseOK = true;
+            return data;
+        } catch(e) {
+            firebaseOK = false;
+            console.warn('Firebase GET error:', e);
+            return null;
         }
     }
-
-    // Lấy Supabase client từ script đã khởi tạo
-    function getSB() {
-        return window._sbClient;
+    async function firebaseDelete(path) {
+        try { await fetch(`${FIREBASE_URL}/${path}.json`, {method:'DELETE'}); } catch(e) {}
+    }
+    async function firebasePush(path, data) {
+        try {
+            const r = await fetch(`${FIREBASE_URL}/${path}.json`, {
+                method: 'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return await r.json();
+        } catch(e) {
+            console.warn('Firebase PUSH error:', e);
+            return null;
+        }
     }
 
     document.getElementById('room-create-btn').addEventListener('click', async () => {
@@ -3471,29 +3479,17 @@ window.addEventListener('DOMContentLoaded', function () {
         roomCode = genId(6);
         const btn = document.getElementById('room-create-btn');
         btn.textContent = '⏳ Đang tạo...'; btn.disabled = true;
-        try {
-            const sb = getSB();
-            // Xóa member cũ nếu có
-            await sb.from('room_members').delete().eq('user_name', name);
-            // Thêm vào phòng
-            await sb.from('room_members').insert({
-                room_code: roomCode, user_name: name,
-                avatar: myAvatar, joined_at: new Date().toISOString(), last_seen: new Date().toISOString()
-            });
-            // Update last_seen ngay lập tức
-            await sb.from('room_members').update({ last_seen: new Date().toISOString() })
-                .eq('room_code', roomCode).eq('user_name', name);
-            // Gửi tin chào
-            await sb.from('room_messages').insert({
-                room_code: roomCode, user_name: 'system',
-                avatar: '', message: `${myAvatar} ${name} đã tạo phòng!`
-            });
-            btn.textContent = '✨ Tạo phòng mới'; btn.disabled = false;
-            enterRoom();
-        } catch(e) {
-            btn.textContent = '✨ Tạo phòng mới'; btn.disabled = false;
-            showRoomError('Không thể tạo phòng, thử lại nhé!');
+        await firebaseSet(`rooms/${roomCode}`, {
+            created: Date.now(),
+            members: { [myUserId]: { name, avatar: myAvatar, status: 'studying', online: true, ts: Date.now() } },
+            messages: {}
+        });
+        btn.textContent = '✨ Tạo phòng mới'; btn.disabled = false;
+        if (!firebaseOK) {
+            showRoomError('⚠️ Không kết nối được Firebase! Kiểm tra internet hoặc Firebase Rules (set read/write = true) rồi thử lại.');
+            return;
         }
+        enterRoom();
     });
 
     document.getElementById('room-join-btn').addEventListener('click', async () => {
@@ -3501,98 +3497,66 @@ window.addEventListener('DOMContentLoaded', function () {
         const code = document.getElementById('room-code-input').value.trim().toUpperCase();
         if (!name) { document.getElementById('room-username').style.borderColor='#f87171'; return; }
         if (!code || code.length !== 6) { document.getElementById('room-code-input').style.borderColor='#f87171'; return; }
+        myName = name; myAvatar = selectedAvatar;
         const btn = document.getElementById('room-join-btn');
         btn.textContent = '⏳ Đang vào...'; btn.disabled = true;
-        try {
-            const sb = getSB();
-            // Kiểm tra phòng có tồn tại không
-            const { data: existing } = await sb.from('room_members')
-                .select('*').eq('room_code', code);
-            if (!existing || existing.length === 0) {
-                btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
-                showRoomError('Không tìm thấy phòng "' + code + '"! Kiểm tra lại mã nhé.');
-                return;
-            }
-            // Kiểm tra giới hạn 5 người
-            const activeMembers = existing.filter(m => {
-                const lastSeen = new Date(m.last_seen).getTime();
-                return Date.now() - lastSeen < 30000;
-            });
-            if (activeMembers.length >= MAX_ROOM_MEMBERS) {
-                btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
-                showRoomError('Phòng đã đầy! Tối đa ' + MAX_ROOM_MEMBERS + ' người.');
-                return;
-            }
-            myName = name; myAvatar = selectedAvatar;
-            myUserId = genId(8); roomCode = code;
-            await sb.from('room_members').delete().eq('room_code', code).eq('user_name', name);
-            await sb.from('room_members').insert({
-                room_code: code, user_name: name,
-                avatar: myAvatar, joined_at: new Date().toISOString(), last_seen: new Date().toISOString()
-            });
-            await sb.from('room_messages').insert({
-                room_code: code, user_name: 'system',
-                avatar: '', message: `${myAvatar} ${name} đã vào phòng!`
-            });
-            btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
-            enterRoom();
-        } catch(e) {
-            btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
-            showRoomError('Không thể vào phòng, thử lại nhé!');
+        const room = await firebaseGet(`rooms/${code}`);
+        btn.textContent = '🚪 Vào phòng'; btn.disabled = false;
+        if (!firebaseOK) {
+            showRoomError('⚠️ Không kết nối được Firebase! Kiểm tra internet hoặc Firebase Rules (set read/write = true) rồi thử lại.');
+            return;
         }
+        if (!room) { alert('❌ Không tìm thấy phòng "' + code + '"! Kiểm tra lại mã nhé.'); return; }
+        myUserId = genId(8); roomCode = code;
+        await firebaseSet(`rooms/${roomCode}/members/${myUserId}`, { name, avatar: myAvatar, status: 'studying', online: true, ts: Date.now() });
+        await firebasePush(`rooms/${roomCode}/messages`, { type:'system', text:`${myAvatar} ${name} đã vào phòng!`, ts: Date.now() });
+        enterRoom();
     });
 
     function enterRoom() {
         document.getElementById('room-setup').style.display = 'none';
         document.getElementById('room-inside').style.display = 'block';
         document.getElementById('room-code-show').textContent = roomCode;
-        showRoomInfo('Kết nối Supabase thành công! Đang tải phòng...');
         loadRoom();
-        // Heartbeat mỗi 8 giây
-        roomPollInterval = setInterval(async () => {
-            const sb = getSB();
-            await sb.from('room_members')
-                .update({ last_seen: new Date().toISOString() })
-                .eq('room_code', roomCode).eq('user_name', myName);
-            loadRoom();
-        }, 8000);
+        heartbeatInterval = setInterval(() => firebasePatch(`rooms/${roomCode}/members/${myUserId}`, { online: true, ts: Date.now() }), 8000);
+        roomPollInterval = setInterval(loadRoom, 3000);
     }
 
     async function loadRoom() {
-        const sb = getSB();
+        const room = await firebaseGet(`rooms/${roomCode}`);
+        if (!room) return;
         const now = Date.now();
-        // Lấy danh sách thành viên
-        const { data: members } = await sb.from('room_members')
-            .select('*').eq('room_code', roomCode);
+        const members = room.members || {};
+        // Render members (online = last ts < 20s)
         const memberList = document.getElementById('room-members-list');
         memberList.innerHTML = '';
         let count = 0;
-        (members || []).forEach(m => {
+        Object.entries(members).forEach(([uid, m]) => {
+            if (now - m.ts > 30000) return; // offline
             count++;
+            const statusLabels = { studying: '📖 Đang học', break: '☕ Nghỉ ngơi', done: '✅ Xong rồi' };
             memberList.innerHTML += `<div class="room-member-item">
                 <span class="member-avatar">${m.avatar}</span>
                 <div class="member-info">
-                    <div class="member-name">${m.user_name}${m.user_name===myName?' (bạn)':''}</div>
-                    <div class="member-status studying">📖 Đang học</div>
+                    <div class="member-name">${m.name}${uid===myUserId?' (bạn)':''}</div>
+                    <div class="member-status ${m.status}">${statusLabels[m.status]||m.status}</div>
                 </div>
             </div>`;
         });
-        document.getElementById('room-member-count').textContent = count + '/' + MAX_ROOM_MEMBERS;
-        // Lấy tin nhắn
-        const { data: msgs } = await sb.from('room_messages')
-            .select('*').eq('room_code', roomCode)
-            .order('created_at', { ascending: true }).limit(50);
+        document.getElementById('room-member-count').textContent = count;
+        // Render messages
         const chatEl = document.getElementById('room-chat-messages');
         const wasAtBottom = chatEl.scrollHeight - chatEl.clientHeight <= chatEl.scrollTop + 10;
+        const msgs = Object.values(room.messages || {}).sort((a,b)=>a.ts-b.ts).slice(-50);
         chatEl.innerHTML = '';
-        (msgs || []).forEach(m => {
-            if (m.user_name === 'system') {
-                chatEl.innerHTML += `<div class="chat-msg system">${m.message}</div>`;
+        msgs.forEach(m => {
+            if (m.type === 'system') {
+                chatEl.innerHTML += `<div class="chat-msg system">${m.text}</div>`;
             } else {
-                const isMe = m.user_name === myName;
+                const isMe = m.uid === myUserId;
                 chatEl.innerHTML += `<div class="chat-msg ${isMe?'me':'other'}">
-                    ${!isMe?`<div class="msg-name">${m.avatar} ${m.user_name}</div>`:''}
-                    ${m.message}
+                    ${!isMe?`<div class="msg-name">${m.avatar} ${m.name}</div>`:''}
+                    ${m.text}
                 </div>`;
             }
         });
@@ -3606,37 +3570,50 @@ window.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.querySelectorAll('.room-status-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!roomCode) return;
+            document.querySelectorAll('.room-status-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            await firebasePatch(`rooms/${roomCode}/members/${myUserId}`, { status: btn.dataset.status, ts: Date.now() });
+        });
+    });
+
     async function sendRoomMsg() {
         const input = document.getElementById('room-chat-text');
         const text = input.value.trim();
         if (!text || !roomCode) return;
         input.value = '';
-        const sb = getSB();
-        await sb.from('room_messages').insert({
-            room_code: roomCode, user_name: myName,
-            avatar: myAvatar, message: text
-        });
-        loadRoom();
+        // Optimistic: show message immediately
+        const chatEl = document.getElementById('room-chat-messages');
+        const tempDiv = document.createElement('div');
+        tempDiv.className = 'chat-msg me';
+        tempDiv.textContent = text;
+        chatEl.appendChild(tempDiv);
+        chatEl.scrollTop = chatEl.scrollHeight;
+        // Push to Firebase
+        const result = await firebasePush(`rooms/${roomCode}/messages`, { uid: myUserId, name: myName, avatar: myAvatar, text, ts: Date.now() });
+        if (result) {
+            // Full reload to get server state
+            loadRoom();
+        }
     }
     document.getElementById('room-chat-send').addEventListener('click', sendRoomMsg);
     document.getElementById('room-chat-text').addEventListener('keydown', e => { if(e.key==='Enter') sendRoomMsg(); });
 
     document.getElementById('room-leave-btn').addEventListener('click', async () => {
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
         if (roomPollInterval) clearInterval(roomPollInterval);
-        if (roomCode && myName) {
-            const sb = getSB();
-            await sb.from('room_members').delete().eq('room_code', roomCode).eq('user_name', myName);
-            await sb.from('room_messages').insert({
-                room_code: roomCode, user_name: 'system',
-                avatar: '', message: `${myAvatar} ${myName} đã rời phòng.`
-            });
+        if (roomCode && myUserId) {
+            await firebaseDelete(`rooms/${roomCode}/members/${myUserId}`);
+            await firebasePush(`rooms/${roomCode}/messages`, { type:'system', text:`${myAvatar} ${myName} đã rời phòng.`, ts: Date.now() });
         }
         roomCode = null; myUserId = null;
         document.getElementById('room-inside').style.display = 'none';
         document.getElementById('room-setup').style.display = 'block';
     });
 
-        // ====================================================
+    // ====================================================
     // 🔄 CHUYỂN ĐỔI ĐƠN VỊ
     // ====================================================
     const CONV_TYPES = [
@@ -3882,355 +3859,206 @@ window.addEventListener('DOMContentLoaded', function () {
 
 });
 
-</script>
-
-<script>
+// ====================================================
+// 🤖 AI CHATBOT - WORKER API (tramhoctap.thegiang322.workers.dev)
+// ====================================================
 (function() {
-  // Chờ Supabase SDK load xong
-  function waitForSupabase(cb, tries) {
-    tries = tries || 0;
-    if (window.supabase && window.supabase.createClient) { cb(); }
-    else if (tries < 50) { setTimeout(function(){ waitForSupabase(cb, tries+1); }, 100); }
-    else { console.error('Supabase SDK không load được!'); }
-  }
+    const WORKER_URL = "https://tramhoctap.thegiang322.workers.dev/";
 
-  waitForSupabase(function() {
-    var SB_URL = 'https://vubcyfjcqlqjxvczeitx.supabase.co';
-    var SB_KEY = 'sb_publishable_gX4k4unWcvnfN6_2Z-BESQ_8_Ygl6m_';
-    var sb = window.supabase.createClient(SB_URL, SB_KEY, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    });
-    window._sbClient = sb; // expose cho phòng học
-    var authMode = 'login';
-    var curUser = null, curProfile = null;
-
-    // Kiểm tra session hiện tại
-    sb.auth.getSession().then(function(res) {
-      if (res.data && res.data.session) {
-        afterLogin(res.data.session.user);
-      }
-    });
-
-    // Lắng nghe thay đổi auth
-    sb.auth.onAuthStateChange(function(event, session) {
-      if (event === 'SIGNED_IN' && session) { afterLogin(session.user); }
-      else if (event === 'SIGNED_OUT') { afterLogout(); }
-    });
-
-    async function afterLogin(user) {
-      curUser = user;
-      var res = await sb.from('profiles').select('*').eq('id', user.id).single();
-      var profile = res.data;
-      if (!profile) {
-        var name = (user.user_metadata && user.user_metadata.full_name)
-          || user.email.split('@')[0];
-        var ins = await sb.from('profiles')
-          .insert({ id: user.id, username: name, xp: 0, level: 1, streak: 0 })
-          .select().single();
-        profile = ins.data;
-      }
-      curProfile = profile;
-      window._curProfile = curProfile;
-      document.getElementById('login-overlay').classList.remove('show');
-      var badge = document.getElementById('user-badge');
-      badge.classList.add('show');
-      document.getElementById('badge-nm').textContent = profile.username || 'Học sinh';
-      document.getElementById('badge-xp').textContent = '⭐ ' + (profile.xp || 0) + ' XP';
-      document.getElementById('badge-ava').textContent = profile.avatar_url || '🧑‍🎓';
-      setTimeout(function(){ if(window._checkDailyLogin) window._checkDailyLogin(); }, 2000);
-    }
-
-    function afterLogout() {
-      curUser = null; curProfile = null;
-      document.getElementById('user-badge').classList.remove('show');
-      document.getElementById('user-menu').classList.remove('show');
-      document.getElementById('login-overlay').classList.add('show');
-    }
-
-    // Expose functions to global scope
-    window.switchTab = function(mode) {
-      authMode = mode;
-      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-      document.getElementById('name-wrap').style.display = mode === 'register' ? 'block' : 'none';
-      document.getElementById('auth-btn').textContent = mode === 'login' ? 'Đăng nhập' : 'Đăng ký';
-      document.getElementById('toggle-txt').innerHTML = mode === 'login'
-        ? 'Chưa có tài khoản? <span onclick="switchTab(\'register\')">Đăng ký ngay</span>'
-        : 'Đã có tài khoản? <span onclick="switchTab(\'login\')">Đăng nhập</span>';
-      showErr('');
+    const SYSTEM_PROMPTS = {
+        chung:  'Bạn là trợ lý AI học tập thông minh của Trạm Học Tập — một ứng dụng học tập dành cho học sinh . Nhiệm vụ của bạn là giúp học sinh hiểu bài, giải thích lý thuyết, hướng dẫn làm bài tập các môn: Toán, Vật lý, Hóa học, Sinh học, Văn học, Tiếng Anh, Lịch sử, Địa lý, Tin học, Công nghệ. Trả lời ngắn gọn, dễ hiểu, thân thiện với học sinh. Dùng tiếng Việt và nhớ rằng bạn không có tên chỉ là AI của Trạm Học Tập S.Squad. Khi giải toán hãy trình bày từng bước rõ ràng.',
+        toan:   'Bạn là gia sư Toán học của Trạm Học Tập S.Squad. Giải toán từng bước rõ ràng, dùng tiếng Việt. Ghi rõ công thức, định lý áp dụng.',
+        van:    'Bạn là gia sư Ngữ Văn của Trạm Học Tập S.Squad. Phân tích tác phẩm, hỗ trợ viết văn, giải thích cảm nhận bằng tiếng Việt.',
+        anh:    'You are an English tutor of Tram Hoc Tap S.Squad for Vietnamese students. Help with grammar, vocabulary, reading, writing in both English and Vietnamese.',
+        khoa:   'Bạn là gia sư Khoa học của Trạm Học Tập S.Squad (Vật lý, Hóa học, Sinh học). Giải thích hiện tượng, công thức, bài tập bằng tiếng Việt dễ hiểu.',
+        su:     'Bạn là gia sư Lịch sử của Trạm Học Tập S.Squad. Giải thích sự kiện lịch sử, ý nghĩa, mốc thời gian rõ ràng bằng tiếng Việt.',
     };
 
-    window.doEmailAuth = async function() {
-      var email = document.getElementById('inp-email').value.trim();
-      var pw = document.getElementById('inp-pw').value;
-      if (!email || !pw) { showErr('Vui lòng nhập email và mật khẩu!'); return; }
-      var btn = document.getElementById('auth-btn');
-      btn.textContent = '⏳ Đang xử lý...'; btn.disabled = true;
-      try {
-        if (authMode === 'login') {
-          var r = await sb.auth.signInWithPassword({ email: email, password: pw });
-          if (r.error) { showErr(r.error.message === 'Invalid login credentials' ? 'Email hoặc mật khẩu không đúng!' : (r.error.message || 'Đăng nhập thất bại!')); }
-        } else {
-          var name = document.getElementById('inp-name').value.trim() || email.split('@')[0];
-          var r = await sb.auth.signUp({ email: email, password: pw, options: { data: { full_name: name } } });
-          if (r.error) { showErr(r.error.message); }
-          else if (r.data.user && !r.data.session) { showErr('📧 Kiểm tra email để xác nhận tài khoản!'); }
+    const SUBJECT_NAMES = {
+        chung:'Chung', toan:'Toán', van:'Văn', anh:'Anh', khoa:'Khoa học', su:'Lịch sử'
+    };
+
+    const GREETINGS = {
+        chung:  'Chào bạn! 👋 Mình là AI của Trạm Học Tập S.Squad. Hỏi mình bất cứ điều gì — Toán, Văn, Anh, Khoa học, Lịch sử... mình đều giúp được! 😊',
+        toan:   '🔢 Chế độ Toán học! Hãy đưa ra bài toán cần giải — mình sẽ giải từng bước chi tiết cho bạn!',
+        van:    '📚 Chế độ Ngữ Văn! Bạn cần phân tích tác phẩm, viết bài luận hay giải thích gì? Mình sẵn sàng!',
+        anh:    '🌍 English Mode! Ask me anything in English or Vietnamese — grammar, vocabulary, writing... I\'m here to help!',
+        khoa:   '🔬 Chế độ Khoa học! Vật lý, Hóa học hay Sinh học? Hỏi mình về bất kỳ hiện tượng hay bài tập nào nhé!',
+        su:     '🏛️ Chế độ Lịch sử! Hỏi mình về các sự kiện, nhân vật hay giai đoạn lịch sử bạn muốn tìm hiểu!',
+    };
+
+    let currentSubject = 'chung';
+    let history        = [];   // [{role, content}] dùng cho worker
+    let isLoading      = false;
+
+    const chatWindow  = document.getElementById('ai-chat-window');
+    const input       = document.getElementById('ai-chat-input');
+    const sendBtn     = document.getElementById('ai-send-btn');
+    const clearBtn    = document.getElementById('ai-clear-btn');
+    const subjectLabel= document.getElementById('ai-subject-label');
+
+    if (!chatWindow || !input || !sendBtn) return; // guard
+
+    // ─── Render message ───────────────────────────────
+    function addMessage(role, text) {
+        const wrap = document.createElement('div');
+        wrap.className = `ai-msg ${role}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'ai-msg-avatar';
+        avatar.textContent = role === 'bot' ? '🤖' : '🧑';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'ai-msg-bubble';
+
+        // Xử lý markdown cơ bản
+        let html = text
+            .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+        bubble.innerHTML = html;
+
+        wrap.appendChild(avatar);
+        wrap.appendChild(bubble);
+        chatWindow.appendChild(wrap);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return bubble;
+    }
+
+    // ─── Typing indicator ─────────────────────────────
+    function addTyping() {
+        const wrap = document.createElement('div');
+        wrap.className = 'ai-msg bot';
+        wrap.id = 'ai-typing-indicator';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'ai-msg-avatar';
+        avatar.textContent = '🤖';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'ai-msg-bubble ai-typing';
+        bubble.innerHTML = '<span></span><span></span><span></span>';
+
+        wrap.appendChild(avatar);
+        wrap.appendChild(bubble);
+        chatWindow.appendChild(wrap);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return wrap; // trả về wrap để .remove()
+    }
+
+    // ─── Gửi tin nhắn (theo logic sendMessage từ web.html) ──────
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text || isLoading) return;
+
+        // Hiển thị tin nhắn người dùng
+        addMessage("user", text);
+        history.push({ role: "user", content: text });
+
+        input.value = "";
+        input.style.height = "";
+        sendBtn.disabled = true;
+        isLoading = true;
+
+        const typingEl = addTyping();
+
+        try {
+            const res = await fetch(WORKER_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: text,
+                    system: SYSTEM_PROMPTS[currentSubject]
+                })
+            });
+
+            const rawText = await res.text();
+            let data;
+
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                throw new Error("Server trả về dữ liệu không hợp lệ:\n" + rawText);
+            }
+
+            typingEl.remove();
+
+            if (!res.ok) {
+                addMessage("bot",
+                    `❌ Lỗi AI Server\nStatus: ${res.status}\nChi tiết: ${data?.detail || data?.error || "Không rõ"}`
+                );
+                history.pop();
+                return;
+            }
+
+            const reply = data.reply || "(AI không trả về nội dung)";
+
+            if (!reply) {
+                addMessage("bot", "(AI không trả về nội dung)");
+                history.pop();
+                return;
+            }
+
+            addMessage("bot", reply);
+            history.push({ role: "assistant", content: reply });
+
+        } catch (err) {
+            typingEl.remove();
+            addMessage("bot", `❌ Lỗi kết nối chi tiết:\n${err.message}`);
+            history.pop();
         }
-      } catch(e) { showErr('Có lỗi xảy ra, thử lại sau!'); }
-      btn.disabled = false;
-      btn.textContent = authMode === 'login' ? 'Đăng nhập' : 'Đăng ký';
-    };
 
-    window.doGoogle = async function() {
-      await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-    };
-
-    window.doLogout = async function() {
-      await sb.auth.signOut();
-    };
-
-    window.toggleMenu = function() {
-      document.getElementById('user-menu').classList.toggle('show');
-    };
-
-    window.openLeaderboard = async function() {
-      document.getElementById('user-menu').classList.remove('show');
-      var res = await sb.from('profiles').select('username,xp,level,avatar_url').order('xp', { ascending: false }).limit(10);
-      var top = res.data || [];
-      var medals = ['🥇','🥈','🥉'];
-      var rows = top.map(function(u, i) {
-        var isMe = curProfile && u.username === curProfile.username;
-        return '<div class="lb-row ' + (isMe ? 'lb-me' : '') + '">' +
-          '<div class="lb-rank">' + (medals[i] || '#'+(i+1)) + '</div>' +
-          '<div class="lb-ava">' + (u.avatar_url || '🧑‍🎓') + '</div>' +
-          '<div class="lb-info">' +
-            '<div class="lb-name">' + u.username + (isMe ? ' (Bạn)' : '') + '</div>' +
-            '<div class="lb-xp-txt">⭐ ' + u.xp + ' XP · Cấp ' + u.level + '</div>' +
-          '</div></div>';
-      }).join('');
-      var old = document.getElementById('lb-popup');
-      if (old) old.remove();
-      var pop = document.createElement('div');
-      pop.id = 'lb-popup';
-      pop.style.cssText = 'position:fixed;inset:0;z-index:700;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75)';
-      pop.innerHTML = '<div style="background:#1e1e2e;border-radius:24px;padding:32px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto;border:1px solid rgba(255,255,255,.1)">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">' +
-          '<h2 style="color:#fde047;font-size:1.4rem">🏆 Bảng Xếp Hạng</h2>' +
-          '<button onclick="document.getElementById(\'lb-popup\').remove()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer">✕</button>' +
-        '</div><div class="lb-wrap">' + rows + '</div></div>';
-      document.body.appendChild(pop);
-      pop.addEventListener('click', function(e) { if (e.target === pop) pop.remove(); });
-    };
-
-    window.syncXP = async function(xp, level) {
-      if (!curUser) return;
-      await sb.from('profiles').update({ xp: xp, level: level }).eq('id', curUser.id);
-      if (curProfile) { curProfile.xp = xp; curProfile.level = level; }
-      window._curProfile = curProfile;
-      document.getElementById('badge-xp').textContent = '⭐ ' + xp + ' XP';
-    };
-
-    function showErr(msg) {
-      var el = document.getElementById('login-err');
-      el.textContent = msg;
+        sendBtn.disabled = false;
+        isLoading = false;
+        input.focus();
     }
 
-    // Enter để submit
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && document.getElementById('login-overlay').classList.contains('show')) {
-        doEmailAuth();
-      }
+    // ─── Đổi tab môn học ──────────────────────────────
+    document.querySelectorAll('.ai-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.ai-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentSubject = tab.dataset.subject;
+            subjectLabel.textContent = `Đang hỏi: ${SUBJECT_NAMES[currentSubject]}`;
+
+            // Xoá history và thêm lời chào mới
+            history = [];
+            chatWindow.innerHTML = '';
+            addMessage('bot', GREETINGS[currentSubject]);
+        });
     });
 
-    // Click ngoài menu thì đóng
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('#user-badge') && !e.target.closest('#user-menu')) {
-        var m = document.getElementById('user-menu');
-        if (m) m.classList.remove('show');
-      }
+    // ─── Xoá chat ─────────────────────────────────────
+    clearBtn.addEventListener('click', () => {
+        history = [];
+        chatWindow.innerHTML = '';
+        addMessage('bot', GREETINGS[currentSubject]);
     });
-  });
+
+    // ─── Gửi bằng nút ─────────────────────────────────
+    sendBtn.addEventListener('click', sendMessage);
+
+    // ─── Gửi bằng Enter (Shift+Enter = xuống dòng) ────
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // ─── Auto resize textarea ─────────────────────────
+    input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+
+    // ─── Lời chào ban đầu ─────────────────────────────
+    addMessage('bot', GREETINGS.chung);
+
+    window.sendMessage = sendMessage;
+
 })();
 </script>
-
-<script>
-// Định nghĩa hàm ngay lập tức để onclick="" hoạt động
-var GEMINI_KEY = 'AIzaSyBLEZG5F4A5M0YDTcnceQ-mlDn6vGRrVmo';
-var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_KEY;
-
-var AI_PROMPTS = {
-    general: 'Bạn là trợ lý học tập thông minh. Trả lời ngắn gọn, dễ hiểu bằng tiếng Việt.',
-    math: 'Bạn là gia sư Toán. Giải từng bước rõ ràng. Trả lời tiếng Việt.',
-    lit: 'Bạn là gia sư Văn học. Phân tích sâu sắc, giúp viết văn hay. Trả lời tiếng Việt.',
-    eng: 'You are an English tutor. Explain in Vietnamese when needed.',
-    sci: 'Bạn là gia sư Khoa học (Lý,Hóa,Sinh). Giải thích rõ ràng. Tiếng Việt.',
-    hist: 'Bạn là gia sư Lịch sử. Trình bày theo timeline, dễ nhớ. Tiếng Việt.'
-};
-
-var aiMode = 'general';
-var aiHistory = [];
-
-// Hàm chuyển chế độ
-function setAIMode(btn, mode) {
-    document.querySelectorAll('.ai-mode-btn').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-    aiMode = mode;
-    aiHistory = [];
-    var names = {general:'Chung',math:'Toán',lit:'Văn',eng:'Tiếng Anh',sci:'Khoa học',hist:'Lịch sử'};
-    addMsg('bot', '✅ Chế độ <b>' + (names[mode]||mode) + '</b>. Hỏi mình đi!');
-}
-
-// Hàm gửi chat
-async function sendAIChat() {
-    var inp = document.getElementById('chat-input');
-    var btn = document.getElementById('send-btn');
-    if (!inp) return;
-    var text = inp.value.trim();
-    if (!text) return;
-
-    inp.value = '';
-    if (btn) btn.disabled = true;
-    inp.disabled = true;
-
-    addMsg('user', text);
-
-    var tid = 'think_' + Date.now();
-    addMsg('bot', '<i style="opacity:.6">⏳ Đang suy nghĩ...</i>', tid);
-
-    // Tăng EXP
-    if (typeof incChatXP === 'function') incChatXP();
-
-    try {
-        aiHistory.push({ role: 'user', parts: [{ text: text }] });
-
-        var resp = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system_instruction: { parts: [{ text: AI_PROMPTS[aiMode] }] },
-                contents: aiHistory.slice(-8)
-            })
-        });
-
-        if (!resp.ok) {
-            var err = await resp.json();
-            throw new Error(err.error && err.error.message || 'HTTP ' + resp.status);
-        }
-
-        var data = await resp.json();
-        var reply = data.candidates && data.candidates[0] && data.candidates[0].content &&
-                    data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-                    data.candidates[0].content.parts[0].text;
-
-        if (!reply) throw new Error('Không có phản hồi từ AI');
-
-        aiHistory.push({ role: 'model', parts: [{ text: reply }] });
-
-        var thinkEl = document.getElementById(tid);
-        if (thinkEl) thinkEl.remove();
-
-        addMsg('bot', fmtReply(reply));
-
-    } catch(e) {
-        var thinkEl = document.getElementById(tid);
-        if (thinkEl) thinkEl.remove();
-        addMsg('bot', '❌ Lỗi: ' + e.message);
-        console.error('Gemini error:', e);
-    }
-
-    if (btn) btn.disabled = false;
-    inp.disabled = false;
-    inp.focus();
-}
-
-function addMsg(role, html, id) {
-    var win = document.getElementById('chat-window');
-    if (!win) return;
-    var div = document.createElement('div');
-    div.className = 'message ' + role;
-    if (id) div.id = id;
-    div.innerHTML = html;
-    win.appendChild(div);
-    win.scrollTop = win.scrollHeight;
-}
-
-function fmtReply(t) {
-    return t
-        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-        .replace(/\*(.*?)\*/g, '<i>$1</i>')
-        .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,.15);padding:2px 6px;border-radius:4px;">$1</code>')
-        .replace(/\n/g, '<br>');
-}
-
-// Enter để gửi
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'chat-input') {
-        e.preventDefault();
-        sendAIChat();
-    }
-});
-
-// ============================================================
-// HỆ THỐNG EXP
-// ============================================================
-var chatCallCount = 0;
-
-function incChatXP() {
-    chatCallCount++;
-    if (chatCallCount % 10 === 0) awardXP(1, 'Hỏi AI 10 lần 🤖');
-}
-
-function awardXP(amount, reason) {
-    if (!window._curProfile) return;
-    var newXP = (window._curProfile.xp || 0) + amount;
-    var newLevel = Math.floor(newXP / 100) + 1;
-    var oldLevel = Math.floor((window._curProfile.xp || 0) / 100) + 1;
-    if (window.syncXP) window.syncXP(newXP, newLevel);
-    showXPToast('+' + amount + ' XP — ' + reason);
-    if (newLevel > oldLevel) {
-        setTimeout(function(){ showXPToast('🎉 Lên cấp ' + newLevel + '!'); }, 1800);
-    }
-}
-
-function showXPToast(msg) {
-    var old = document.getElementById('xp-toast');
-    if (old) old.remove();
-    var t = document.createElement('div');
-    t.id = 'xp-toast';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#ec4899);color:white;font-weight:800;padding:12px 28px;border-radius:30px;z-index:9000;font-size:1rem;box-shadow:0 8px 25px rgba(168,85,247,.5);pointer-events:none;white-space:nowrap;';
-    t.textContent = '⭐ ' + msg;
-    document.body.appendChild(t);
-    setTimeout(function(){ t.style.transition='opacity .5s'; t.style.opacity='0'; setTimeout(function(){ if(t.parentNode)t.remove(); }, 500); }, 2500);
-}
-
-// Pomodoro EXP - gọi khi hoàn thành 25 phút
-window._onPomoDone = function() {
-    awardXP(10, 'Hoàn thành 25 phút học 🌳');
-};
-
-// Daily login
-function checkDailyLogin() {
-    if (!window._curProfile) return;
-    var today = new Date().toDateString();
-    var key = 'daily_' + window._curProfile.id;
-    if (localStorage.getItem(key) !== today) {
-        localStorage.setItem(key, today);
-        setTimeout(function(){ awardXP(5, 'Đăng nhập hàng ngày 📅'); }, 1500);
-    }
-}
-
-window._awardEXP = awardXP;
-window._checkDailyLogin = checkDailyLogin;
-
-// Chờ auth xong rồi check daily login
-setTimeout(function(){
-    if (window._curProfile) checkDailyLogin();
-}, 3000);
-</script>
-
 </body>
 </html>
